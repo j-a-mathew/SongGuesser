@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Fab from '@mui/material/Fab';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
-import { TextField, Button, Alert, Typography, Chip } from '@mui/material'
+import { TextField, Button, Alert, Typography, Chip, Snackbar } from '@mui/material'
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import styles from '../../styles.module.css';
-import { getSong, stopSnippet, nextSnippet, previousSnippet, getSongInfo } from '../../api';
+import { getSong, stopSnippet, playSnippet, getSongInfo, getPlaylistInfo } from '../../api';
 
 type Inputs = {
     guess: string,
@@ -43,28 +42,31 @@ declare module '@mui/material/Button' {
   }
 }
 
-
 export const SongGuesser = () => {
 
     const { register, control, handleSubmit, formState: { errors } } = useForm<Inputs>();
-    // let trackNum = 0;
-
-    
 
     const [trackNum, setTrackNum] = useState(0);
-    // guessStatus controls whether message appears to user to indicate a correct guess
-    // guessStatus = 0 indicates no guess yet, guessStatus = 1 indicates correct artist
-    // guessStatus = 2 indicates correct song (correct answer)
-    // guessStatus = 3 indicates wrong answer
-    // guessStatus = 4 indicates user pressed Submit before song was retrieved
-    // guessStatus = 5 indicates user trying to guess song they already guessed correctly (is in alreadyGuessed array)
+
+    /* guessStatus controls whether a message appears to user to indicate a correct guess
+       guessStatus = 0 indicates no guess yet; 
+       guessStatus = 1 indicates correct artist;
+       guessStatus = 2 indicates correct song (correct answer);
+       guessStatus = 3 indicates wrong answer;
+       guessStatus = 4 indicates user pressed Submit before song was retrieved;
+       guessStatus = 5 indicates user trying to guess song they already guessed correctly (is in alreadyGuessed array) */
     const [guessStatus, setGuessStatus] = useState(0);
     const [correctGuesses, setCorrectGuesses] = useState(0);
     const [buttonClicks, setButtonClicks] = useState(0);
+    const [numNextPrevClicks, setNumNextPrevClicks] = useState(0); // counter for num of times next/prev buttons clicked
     const [previousSongState, setPreviousSongState] = useState("");
     const [alreadyGuessed, setAlreadyGuessed] = useState([""]);
+    const [open, setOpen] = useState(false);    // state for Snackbar
     const isMounted = useRef(false);
 
+    // const [listenedTracks, setListenedTracks] = useState(new Set());
+
+    console.log(isMounted.current)
     // TODO: need to initialize previousSongInfo with 1st song info, 
     // but getting undefined for the info, so cannot pull name
     // use state???
@@ -111,11 +113,14 @@ export const SongGuesser = () => {
             return;
         }
 
-        // set up guessStatus = 5 
-        // need to get playlist length to stop user from clicking next or previous too many times
+        // set up guessStatus = 5 --> DONE
+        // need to get playlist length to stop user from clicking next or previous too many times --> DONE
 
         //previousSongState.toLowerCase() != currentSong.toLowerCase()
-        if (data.guess.toLowerCase().includes(currentSong) && !alreadyGuessed.includes(currentSong)){
+        if (data.guess.toLowerCase().includes(currentSong) && alreadyGuessed.includes(currentSong)){
+            console.log("Guess status of 5, These have been guessed: ", alreadyGuessed)
+            setGuessStatus(5);
+        } else if (data.guess.toLowerCase().includes(currentSong)){
             console.log("SUCCESS");
             // if (trackNum === 0){
             //     initializePrevSong(trackNum);
@@ -128,8 +133,8 @@ export const SongGuesser = () => {
             console.log("PARTIAL SUCCESS (ARTIST)");
             setGuessStatus(1);
         // v fix this logic for going to the next song; if on next song and user makes multiple guesses,
-        // incorrect alert should still show up!
-        } else if (buttonClicks > 0 && (guessStatus === 0 || guessStatus === 2 || guessStatus === 3) ){
+        // incorrect alert should still show up! --> FIXED? (removed guessStatus===3)
+        } else if (buttonClicks > 0 && (guessStatus === 0 || guessStatus === 2) ){
             setGuessStatus(0);
         } else {
             console.log("INCORRECT")
@@ -155,8 +160,12 @@ export const SongGuesser = () => {
             return <Alert sx={{mx: "auto", mb: 2, width: 250, px: 4}}
                     variant="filled" 
                     severity="error">Play the song before guessing!</Alert>
+        } else if (props.status === 5) { 
+            return <Alert sx={{mx: "auto", mb: 2, width: 275, px: 4}}
+                    variant="filled" 
+                    severity="error">You can't guess the same song again!</Alert>
         } else {
-            return <p></p>
+            return <></>
         }
     }
 
@@ -171,42 +180,76 @@ export const SongGuesser = () => {
         stopSnippet();
     }
 
-    // useEffect( () => {
-    //     nextSnippet(trackNum)
-    // }, [])
+    console.log("2nd time mounted", isMounted.current)
+
+    useEffect( () => {
+        console.log("3rd time mounted", isMounted.current)
+        console.log("track num for use effect ", trackNum)
+        if (isMounted.current && numNextPrevClicks > 0){
+            console.log("testerrrr")
+            playSnippet(trackNum)
+        } else {
+            console.log("testerrrr22222")
+            isMounted.current = true;
+        }
+        console.log([trackNum])
+    }, [trackNum])
 
     // useEffect( () => {
-    //     if (isMounted.current){
-    //         nextSong(trackNum)
-    //     } else {
-    //         isMounted.current = true;
+    //     if (!listenedTracks.has(trackNum)){
+    //         nextSnippet(trackNum);
+    //         const nextSet = new Set(listenedTracks);
+    //         nextSet.add(trackNum);
+    //         setListenedTracks(nextSet);
     //     }
-    // })
+    // }, [trackNum])
 
     const nextSong = (event: any) => {
         event.stopPropagation();
+        setNumNextPrevClicks(numNextPrevClicks + 1);
+        const playlistLength = getPlaylistInfo().tracks.total;
         console.log("Next song track num: ", trackNum)
-        /* figure out logic for useEffect to make sure next song gets updated appropriately */
-        setTrackNum(trackNum + 1);
-        setGuessStatus(0); // remove the Alert (if present) if user moves to next 
-        setButtonClicks(0); // reset the button clicks when you go to next song
-        console.log("Next song track num: ", trackNum)
-        nextSnippet(trackNum)
+        /* figure out logic for useEffect to make sure nxt song gets updated appropriately */
+        if (trackNum >= playlistLength-1) {
+            console.log("You've reached the end of the songs!");
+            setOpen(true);
+        } else {
+            setTrackNum(trackNum + 1);
+            setGuessStatus(0); // remove the Alert (if present) if user moves to next 
+            setButtonClicks(0); // reset the button clicks when you go to next song
+            console.log("Next song track num: ", trackNum)
+            // nextSnippet(trackNum)
+        }
     }
 
     const previousSong = (event: any) => {
         event.stopPropagation();
+        setNumNextPrevClicks(numNextPrevClicks + 1);
         console.log("Prev Track #: ", trackNum)
-        setTrackNum(trackNum - 1)
-        setGuessStatus(0); // remove the Alert (if present) if user moves to previous song
-        setButtonClicks(0); // reset the button clicks when you go to previous song
-        previousSnippet(trackNum)
+        if (trackNum <= 0){
+            console.log("You've reached the beginning of the songs!");
+            setOpen(true);
+        } else {
+            setTrackNum(trackNum - 1)
+            setGuessStatus(0); // remove the Alert (if present) if user moves to previous song
+            setButtonClicks(0); // reset the button clicks when you go to previous song
+            // previousSnippet(trackNum)
+        }
     }
 
+    const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+    
+        setOpen(false);
+    };
+
     return (
-        <div className={styles.backgroundColor}>
-            <div className={styles.verticalCenter}>
-                <Typography variant="h2" gutterBottom>SongGuesser</Typography>
+        <div className={`${styles.backgroundColor}`}>
+            <div className={`${styles.verticalCenter} ${styles.borderBox}`}>
+            <div className={`${styles.verticalCenter}`}>
+                <Typography variant="h2" color="common.white" gutterBottom>SongGuesser</Typography>
                 <Fab sx={{m: 2}} onClick={previousSong} color="primary" aria-label="previous-song">
                     <SkipPreviousIcon/>
                 </Fab>
@@ -237,7 +280,6 @@ export const SongGuesser = () => {
                                 helperText={errors.guess ? errors.guess.message : ''} 
                             />
                         )}
-                    // {errors.guess && <span>You must enter a guess!</span>}
                     />
                     <br></br>
                     <br></br>
@@ -252,6 +294,16 @@ export const SongGuesser = () => {
                     <Chip icon={<VideogameAssetIcon />} color="primary" label={`Current Score: ${correctGuesses}`}></Chip>
                 </form>
             </div>
+            </div>
+            <Snackbar
+                anchorOrigin={{ vertical: "bottom", horizontal: "center"}}
+                open={open}
+                autoHideDuration={3000}
+                onClose={handleClose}
+                message={`You've reached 
+                            ${trackNum <= 0 ? 'the beginning' : trackNum >= getPlaylistInfo().tracks.total-1 
+                                            ? 'the end' : 'song ' + (trackNum+1)} of the track list!`}
+            />
         </div>
     )
 }

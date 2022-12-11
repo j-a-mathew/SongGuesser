@@ -2,6 +2,7 @@ import { Buffer } from 'buffer';
 
 let playSong: any;
 let trackInfo: any;
+let playlistInfo: any;
 
 const clientId = '4888a7311f4f49f8a30a704f200e4e0c';
 const clientSecret = '2f176e0bd71847bb8919696a393764f4';
@@ -43,6 +44,7 @@ export const clickedEvent = async (trackNum: number) => {
     let result = await fetch(request);
 
     let response = await result.json();
+    playlistInfo = response;
     console.log("Track num", trackNum, "Response is ", response);
 
     trackInfo = response.tracks.items[trackNum].track
@@ -60,6 +62,10 @@ export const clickedEvent = async (trackNum: number) => {
     
 }
 
+export const getPlaylistInfo = () => {
+    return playlistInfo;
+}
+
 const songSnippet = (url: string) => {
     playSong = new Audio(url);
     return playSong.play()
@@ -68,12 +74,6 @@ const songSnippet = (url: string) => {
 export const getSongInfo = () => {
     return trackInfo;
 }
-
-// export const getPreviousSongInfo = (trackNum: number) => {
-//     clickedEvent(trackNum, true);
-//     // console.log("getprevious trackinfo", trackInfo);
-//     return trackInfo;
-// }
 
 export function getSong(trackNum: number){
     // console.log("CLICKED");
@@ -85,12 +85,7 @@ export const stopSnippet = () => {
     return playSong.pause();
 }
 
-export const nextSnippet = (currentTrack: number) => {
-    console.log("Next song!");
-    clickedEvent(currentTrack);
-}
-
-export const previousSnippet = (currentTrack: number) => {
-    console.log("Previous song!");
+export const playSnippet = (currentTrack: number) => {
+    console.log("Moving on!");
     clickedEvent(currentTrack);
 }

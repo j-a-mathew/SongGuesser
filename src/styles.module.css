@@ -37,6 +37,7 @@ ul {
 }
 
 li a {
+    color: white;
     padding: 15px 15px;
     text-decoration: none;
 }
@@ -72,12 +73,20 @@ li:hover{
 } */
 
 .backgroundColor{
-    background-color: rgba(95, 158, 160, 0.623);
+    /* background-color: rgba(49, 153, 250, 0.562); */
+    background-color: #0093E9;
+    background-image: linear-gradient(160deg, #2205ca88 0%, #80D0C7 100%);
+
+    /* rgba(95, 158, 160, 0.623); */
     background-position: center;
     position: absolute;
     text-align: center;
     height: 100%;
     width: 100%;
+}
+
+.marginTop {
+    margin-top: 5%;
 }
 
 .verticalCenter {
@@ -87,4 +96,45 @@ li:hover{
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
+}
+
+.leftAlign {
+    text-align: left;
+}
+
+.recordImage {
+    content: url('../src/assets/images/records-unsplash.jpg');
+    filter: sepia(35%);
+    /* margin: 40px auto;
+    position: absolute;
+    width: 70%; */
+    margin: 0;
+    top: 50%;
+    width: 60%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    border: 1px black solid;
+    border-radius: 10px;
+}
+
+.mainText {
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: rgb(247, 247, 247);
+    
+    text-shadow: -1px 1px 2px #000,
+				  1px 1px 2px #000,
+				  1px -1px 0 #000,
+				  -1px -1px 0 #000;
+    position: absolute;
+    top: 37%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.borderBox {
+    height: 550px;
+    width: 500px;
+    border: 2px rgb(243, 243, 243) solid;
+    border-radius: 50px;
 }

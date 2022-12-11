@@ -1,11 +1,15 @@
 import React from 'react';
-import { Navbar } from '../Navbar';
 import styles from '../../styles.module.css';
+import Typography from '@mui/material/Typography';
 
 export const Home = () => {
     return (
         <div className={styles.backgroundColor}>
-            <h1 className={styles.verticalCenter}>Home</h1>
+            <div>
+                <Typography variant="h2" className={styles.mainText}>SongGuesser</Typography>
+                <div className={`${styles.recordImage} ${styles.verticalCenter}`}></div>
+            </div>
+            
         </div>
     )
 }

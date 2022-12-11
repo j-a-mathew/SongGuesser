@@ -1,14 +1,30 @@
 // installed:
 // react-hook-form
+// react-router-dom
 // @mui/material
 // @mui/icons-material
+// firebase
+// reactfire
+// @reduxjs/toolkit
+// react-redux
+// pg
+// pg-hstore
+// sequelize
+// express
+// cors
+// url -> for polyfill webpack error
+// util -> for polyfill webpack error
+// assert -> for polyfill webpack error
 
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
-import { Home, Navbar, Contact, About, SongGuesser, ErrorPage } from './components';
+import { Home, Navbar, Contact, About, SongGuesser, ErrorPage, SignIn, Leaderboard } from './components';
 import { createBrowserRouter, RouterProvider, Route, createRoutesFromElements } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
+import { AuthProvider, FirebaseAppProvider } from 'reactfire';
+import { firebaseConfig, app } from './firebaseConfig';
 
 const router = createBrowserRouter([
     {
@@ -31,17 +47,31 @@ const router = createBrowserRouter([
             {
                 path: "/song-guesser",
                 element: <SongGuesser />
+            },
+            {
+                path: "/signin",
+                element: <SignIn />
+            },
+            {
+                path: "/leaderboard",
+                element: <Leaderboard />
             }
         ]
     }
 ])
+
+const auth = getAuth(app);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+    <FirebaseAppProvider firebaseConfig={firebaseConfig}>
+        <AuthProvider sdk={auth}>
+            <RouterProvider router={router} />
+        </AuthProvider>
+    </FirebaseAppProvider>
     </React.StrictMode>
 );
 
