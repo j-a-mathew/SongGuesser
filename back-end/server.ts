@@ -1,6 +1,7 @@
-const express = require("express");
-const cors = require("cors");
-const db = require("./models/leaderboard_model.ts");
+import express from "express";
+import cors from "cors";
+import {database as db} from "./models/leaderboard_model";
+import { routes } from "./routes/leaderboard_routes";
 
 const app = express();
 
@@ -37,12 +38,10 @@ app.get("/", (res: any) => {
     res.json({ message: "Welcome to the application." });
 });
 
-require("./routes/leaderboard_routes.ts")(app);
+routes(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });
-
-export {};

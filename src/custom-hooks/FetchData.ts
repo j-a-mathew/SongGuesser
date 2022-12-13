@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { server_calls } from '../back-end/controllers/leaderboard_controller.mjs';
+import { server_calls } from '../../back-end/controllers/leaderboard_controller';
 
 export const useGetData = () => {
     const [leaderboardData, setData] = useState<[]>([]);

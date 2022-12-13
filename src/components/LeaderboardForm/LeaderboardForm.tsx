@@ -5,7 +5,7 @@ import { chooseFirstName, chooseLastName, chooseFavSong, chooseScore} from '../.
 import { Input } from '../SharedComponents/Input';
 import { Button } from '@mui/material';
 // import { server_calls } from '../../api';
-import { server_calls } from '../../back-end/controllers/leaderboard_controller.mjs';
+import { server_calls } from '../../../back-end/controllers/leaderboard_controller.js';
 
 interface LeaderboardFormProps {
     id?: string;

@@ -1,5 +1,9 @@
-const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = new Sequelize('postgres://szvjeinm:LBZU2yGB6zWfYUAI8V33xXiE-Jpu_Q9M@rajje.db.elephantsql.com/szvjeinm')
+import * as pg from 'pg';
+
+import { Sequelize, DataTypes } from 'sequelize';
+const sequelize = new Sequelize('postgres://szvjeinm:LBZU2yGB6zWfYUAI8V33xXiE-Jpu_Q9M@rajje.db.elephantsql.com/szvjeinm', {
+    dialectModule: pg
+})
 
 const tryConnect = async () => {
     try {
@@ -42,5 +46,3 @@ export const database = {
 
 // db.Sequelize = Sequelize;
 // db.sequelize = sequelize;
-
-// db.leaderboards = require("./")

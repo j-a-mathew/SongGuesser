@@ -1,7 +1,9 @@
-module.exports = (app: any) => {
-    const leaderboard_routes = require("../controllers/leaderboard_controller.ts");
+import {server_calls as leaderboard_routes} from '../controllers/leaderboard_controller';
+import * as express from 'express';
+
+export const routes = (app: any) => {
   
-    var router = require("express").Router();
+    const router = express.Router();
   
     // Create a new Leaderboard
     router.post("/", leaderboard_routes.create);
@@ -27,4 +29,3 @@ module.exports = (app: any) => {
     app.use('/api/leaderboard', router);
 };
  
-export {};

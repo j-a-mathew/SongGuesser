@@ -9,7 +9,7 @@ import { Button,
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { LeaderboardForm } from '../LeaderboardForm';
 import { useGetData } from '../../custom-hooks';
-import { server_calls } from '../../back-end/controllers/leaderboard_controller.mjs';
+import { server_calls } from '../../../back-end/controllers/leaderboard_controller';
 
 const columns: GridColDef[] = [
     {field: 'id', headerName: 'ID', width: 90, hide: true},

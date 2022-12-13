@@ -1,56 +1,75 @@
-// const db_control = require("../models/leaderboard_model.ts");
-import { database as db_control } from '../models/leaderboard_model.ts';
+//testing
+
+import { database as db_control } from '../models/leaderboard_model';
 const Leaderboard_control = db_control.Leaderboard;
 
 export const server_calls = {
     
     // Create and Save a new Leaderboard entry
-    create: (req, res) => {
-        // Validate request
-        if (!req.body.firstName) {
-            res.status(400).send({
-                message: "First name is required!"
-        });
-            return;
-        }
-    
-        // Create a Leaderboard entry
+    create: (data: any = {}) => {
         const leaderboard_entry = {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            favSong: req.body.favSong ? req.body.favSong : "None selected",
-            score: req.body.score
+            firstName: data.firstName,
+            lastName: data.lastName,
+            favSong: data.favSong ? data.favSong : "None selected",
+            score: data.score
         };
+
+        Leaderboard_control.create(leaderboard_entry);
+        
+        // // Validate request
+        // if (!req.body.firstName) {
+        //     res.status(400).send({
+        //         message: "First name is required!"
+        // });
+        //     return;
+        // }
     
-        // Save Leaderboard entry in the database
-        Leaderboard_control.create(leaderboard_entry)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-            message:
-                err.message || "An error occurred when trying to create the Leaderboard entry."
-            });
-        });
+        // // Create a Leaderboard entry
+        // const leaderboard_entry = {
+        //     firstName: req.body.firstName,
+        //     lastName: req.body.lastName,
+        //     favSong: req.body.favSong ? req.body.favSong : "None selected",
+        //     score: req.body.score
+        // };
+    
+        // // Save Leaderboard entry in the database
+        // Leaderboard_control.create(leaderboard_entry)
+        // .then(data => {
+        //     res.send(data);
+        // })
+        // .catch(err => {
+        //     res.status(500).send({
+        //     message:
+        //         err.message || "An error occurred when trying to create the Leaderboard entry."
+        //     });
+        // });
     },
     
     // Retrieve all Leaderboard entries from the database.
-    findAll: (req, res) => {
-        return Leaderboard_control.findAll()
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "An error occured while trying to retrive the Leaderboard."
-            })
-        })
+    findAll: async () => {
+        const response = (await Leaderboard_control.findAll()).map(elem => elem.get({plain: true}))
+
+        if (!response){
+            throw new Error("Failed to fetch data from the server!")
+        }
+
+        return await JSON.parse(JSON.stringify(response, null, 2));
+
+
+        // return Leaderboard_control.findAll()
+        // .then(data => {
+        //     res.send(data);
+        // })
+        // .catch(err => {
+        //     res.status(500).send({
+        //         message:
+        //             err.message || "An error occured while trying to retrive the Leaderboard."
+        //     })
+        // })
     },
 
     // Find a single Leaderboard entry with an id
-    findOne: (req, res) => {
+    findOne: (req:any, res:any) => {
         const id = req.params.id;
 
         Leaderboard_control.findByPk(id)
@@ -71,14 +90,15 @@ export const server_calls = {
     },
 
     // Update a Leaderboard entry by the id in the request
-    update: (req, res) => {
+    update: (req:any, res:any) => {
         const id = req.params.id;
 
         Leaderboard_control.update(req.body, {
             where: {id: id}
         })
         .then(num => {
-            if (num == 1) {
+            // update
+            if (id) {
                 res.send({
                     message: "Leaderboard was updated successfully."
                 });
@@ -96,32 +116,32 @@ export const server_calls = {
     },
 
     // Delete a Leaderboard entry with the specified id in the request
-    delete: (req, res) => {
-        const id = req.params.id;
+    delete: (id: string) => {
+        // const id = req.params.id;
 
         Leaderboard_control.destroy({
             where: {id: id}
         })
-        .then(num => {
-            if (num == 1){
-                res.send({
-                    message: "Leaderboard entry was deleted successfully!"
-                });
-            } else {
-                res.send({
-                    message: `Cannot delete Leaderboard entry with id=${id}. Entry may not have been found!`
-                });
-            }  
-        })
-        .catch (err => {
-            res.status(500).send({
-                message: `Could not delete Leaderboard entry with id=${id}`
-            });
-        });
+        // .then(num => {
+        //     if (num == 1){
+        //         res.send({
+        //             message: "Leaderboard entry was deleted successfully!"
+        //         });
+        //     } else {
+        //         res.send({
+        //             message: `Cannot delete Leaderboard entry with id=${id}. Entry may not have been found!`
+        //         });
+        //     }  
+        // })
+        // .catch (err => {
+        //     res.status(500).send({
+        //         message: `Could not delete Leaderboard entry with id=${id}`
+        //     });
+        // });
     },
 
     // Delete all Leaderboard entries from the database.
-    deleteAll: (req, res) => {
+    deleteAll: (req: any, res: any) => {
         Leaderboard_control.destroy({
             where: {},
             truncate: false
