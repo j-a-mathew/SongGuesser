@@ -112,6 +112,9 @@ export const Leaderboard = () => {
         <div className={styles.backgroundColor}>
             <div className={styles.marginTop}>
                 <Typography variant="h2" color="common.white" sx={{mb:4}}>Leaderboard</Typography>
+                <Typography variant="h6" color="common.white" sx={{mb:2}}>The Leaderboard is hosted via Glitch, which puts projects to sleep after 5 minutes of inactivity.
+                    If you don't see any data just yet, please wait! Glitch will wake the project up shortly! :)
+                </Typography>
                 <div>
                     <div>
                         <Button onClick={handleOpenCreate} sx={{mt:2, mb: 3}} variant="contained" color="success">Create Entry Using Score</Button>
